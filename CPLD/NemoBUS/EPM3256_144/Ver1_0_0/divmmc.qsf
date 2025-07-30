@@ -98,4 +98,4 @@ set_location_assignment PIN_137 -to poweron
 set_location_assignment PIN_136 -to mapcondout
 set_location_assignment PIN_75 -to A[7]
 set_location_assignment PIN_125 -to clock
-set_location_assignment PIN_74 -to mreq
+set_location_assignment PIN_36 -to mreq

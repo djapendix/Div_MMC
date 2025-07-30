@@ -96,7 +96,7 @@ D[3]                         : 32        : bidir  : 3.3-V LVTTL       :         
 GND                          : 33        : gnd    :                   :         :           :                
 RESERVED                     : 34        :        :                   :         :           :                
 RESERVED                     : 35        :        :                   :         :           :                
-RESERVED                     : 36        :        :                   :         :           :                
+mreq                         : 36        : input  : 3.3-V LVTTL       :         :           : Y              
 RESERVED                     : 37        :        :                   :         :           :                
 RESERVED                     : 38        :        :                   :         :           :                
 RESERVED                     : 39        :        :                   :         :           :                
@@ -134,7 +134,7 @@ RESERVED                     : 70        :        :                   :         
 RESERVED                     : 71        :        :                   :         :           :                
 RESERVED                     : 72        :        :                   :         :           :                
 VCCIO                        : 73        : power  :                   : 3.3V    :           :                
-mreq                         : 74        : input  : 3.3-V LVTTL       :         :           : Y              
+RESERVED                     : 74        :        :                   :         :           :                
 A[7]                         : 75        : input  : 3.3-V LVTTL       :         :           : Y              
 VCCIO                        : 76        : power  :                   : 3.3V    :           :                
 GND                          : 77        : gnd    :                   :         :           :                
