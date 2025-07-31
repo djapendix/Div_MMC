@@ -114,7 +114,7 @@ begin
  
 	ramwr <= wr or A(15) or A(14) or not a(13) or (not conmem and mapram and bank3 ) or (not conmem and not automap) or (not conmem and  eprom and not mapram);
 
-	romcs <= '1' when ((automap and not eprom) or (automap and mapram) or conmem )='1' else '0' ;
+	romcs <= '1' when ((automap and not eprom) or (automap and mapram) or conmem )='1' else '0' ;	-- RDR
  
 --	============================================================================================================  
 -- Divide Automapping logic			  
