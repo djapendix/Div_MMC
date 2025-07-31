@@ -3,12 +3,12 @@
 -- Engineer:   Mario Prato
 -- Create Date:    10:07:18 11/22/2012
 -- 
--- Modified for Altera EPM7128SLC84
+-- Modified for Altera EPM3256ATC144-10N
 -- Redesign Date:    02:54:18 11/22/2020 
 --
--- Module Name:    divmmc - Behavioral 
--- Project Name:  divmmc
--- Target Devices: EPM7128SLC84-15N
+-- Module Name:	divmmc - Behavioral 
+-- Project Name:	divmmc CPLD
+-- Target Devices: EPM3256ATC144-10N
 -- Tool versions: Quartus II 13.0SP1
 -- Description: zx spectrum mmc sd interface
 ----------------------------------------------------------------------------------
@@ -16,13 +16,13 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
-
+--	============================================================================================================
 entity divmmc is
 Port ( 
 
 -- z80 cpu signals
 	A        : in  std_logic_vector (15 downto 0);
-	D        : inout  std_logic_vector (7 downto 0);
+	D        : inout	std_logic_vector (7 downto 0);
 	iorq     : in  std_logic;
 	mreq     : in  std_logic;
 	wr       : in  std_logic;
@@ -32,18 +32,18 @@ Port (
 	clock    : in  std_logic; -- Z80 Clock from ula chip (must be negated from edge connector signal)
  
 -- ram/rom signals
-	romcs    : out  STD_LOGIC;		-- 1 -> page out spectrum rom
+	romcs    : out	STD_LOGIC;		-- 1 -> page out spectrum rom
 	romoe    : out STD_LOGIC;		-- eeprom oe pin
 	romwr    : out STD_LOGIC;		-- eeprom wr pin
 	ramoe    : out STD_LOGIC;		-- ram oe pin
-	ramwr    : out  STD_LOGIC;		-- ram wr pin
-	bankout  : out  STD_LOGIC_VECTOR (5 downto 0);	--ram bank no.
+	ramwr    : out	STD_LOGIC;		-- ram wr pin
+	bankout  : out	STD_LOGIC_VECTOR (5 downto 0);	--ram bank no.
 			  
 -- spi interface 
 	card         : out std_logic_vector(1 downto 0) :="11";	-- Cards CS
-	spi_clock    : out std_logic :='1';	-- card clock
-	spi_dataout  : out std_logic :='1';	-- card data in
-	spi_datain   :	in std_logic :='1';	-- card data out
+	spi_clock    : out std_logic	:='1';	-- card clock
+	spi_dataout  : out std_logic	:='1';	-- card data in
+	spi_datain   :	in	std_logic	:='1';	-- card data out
 
 -- various 			  
 	poweron      : in  STD_LOGIC;		-- low pulse on poweron
@@ -51,26 +51,26 @@ Port (
 	mapcondout   : out  std_logic		-- hi when divmmc mem paged in
 );
 end divmmc;
-
+--	============================================================================================================
 
 architecture Behavioral of divmmc is
 
-	signal address  : std_logic_vector(7 downto 0) ;
-	signal zxmmcio : std_logic;
-	signal divideio : std_logic;
+	signal address		: std_logic_vector(7 downto 0);
+	signal zxmmcio		: std_logic;
+	signal divideio	: std_logic;
 
-	signal bank     : std_logic_vector (5 downto 0) := "000000";
+	signal bank			: std_logic_vector (5 downto 0) := "000000";
 
-	signal mapterm  : std_logic := '0';
-	signal mapcond  : std_logic := '0';
-	signal conmem   : std_logic  := '0';
-	signal mapram   : std_logic  := '0';
-	signal automap  : std_logic  := '0';
+	signal mapterm		: std_logic	:= '0';
+	signal mapcond		: std_logic	:= '0';
+	signal conmem		: std_logic	:= '0';
+	signal mapram		: std_logic	:= '0';
+	signal automap		: std_logic	:= '0';
  
-	signal map3DXX  : std_logic;
-	signal map1F00  : std_logic;
+	signal map3DXX		: std_logic;
+	signal map1F00		: std_logic;
 
-	signal bank3    : std_logic;
+	signal bank3		: std_logic;
  
  
 -- Transmission states
@@ -82,21 +82,21 @@ architecture Behavioral of divmmc is
 	
 	signal TState : unsigned(3 downto 0) := (others => '0');		-- Counts the T-States during transmission
 	
-	signal fromSDByte : std_logic_vector(7 downto 0) := (others => '1');	-- Byte received from SD
-	signal toSDByte : std_logic_vector(7 downto 0) := (others => '1');	-- Byte to send to SD
-	signal toCPUByte : std_logic_vector(7 downto 0) := (others => '1');	-- Byte seen by the CPU after a byte read
+	signal fromSDByte	: std_logic_vector(7 downto 0) := (others => '1');	-- Byte received from SD
+	signal toSDByte	: std_logic_vector(7 downto 0) := (others => '1');	-- Byte to send to SD
+	signal toCPUByte	: std_logic_vector(7 downto 0) := (others => '1');	-- Byte seen by the CPU after a byte read
  
 -- dichiarazioni constanti 
  
-	constant divide_control_port : std_logic_vector(7 downto 0) := x"E3";	-- port %11100011
-	constant zxmmc_control_port : std_logic_vector(7 downto 0) := x"E7";	-- era la porta 31 nella zxmmc+
-	constant zxmmc_spi_port : std_logic_vector(7 downto 0) := x"EB";	-- era la porta 63 nella zxmmc+
+	constant divide_control_port	: std_logic_vector(7 downto 0) := x"E3";	-- port %11100011
+	constant zxmmc_control_port	: std_logic_vector(7 downto 0) := x"E7";	-- era la porta 31 nella zxmmc+
+	constant zxmmc_spi_port			: std_logic_vector(7 downto 0) := x"EB";	-- era la porta 63 nella zxmmc+
 
  
 attribute PWR_MODE: string;
 attribute FAST: string;
 attribute BUFG: string;
- 
+--	============================================================================================================ 
 begin
  
 	address <= A(7 downto 0);
@@ -116,21 +116,20 @@ begin
 
 	romcs <= '1' when ((automap and not eprom) or (automap and mapram) or conmem )='1' else '0' ;
  
- --  
- -- Divide Automapping logic			  
+--	============================================================================================================  
+-- Divide Automapping logic			  
  
-	mapterm <= '1' when  A(15 downto 0) = x"0000"   or 
+	mapterm	<= '1' when	A(15 downto 0) = x"0000"   or 
 								A(15 downto 0) = x"0008"   or 
 								A(15 downto 0) = x"0038"   or 
 								A(15 downto 0) = x"0066"   or 
 								A(15 downto 0) = x"04c6"   or 
 								A(15 downto 0) = x"0562"   else '0';
 
-	map3DXX   <= '1' when A(15 downto 8) = "00111101"   else '0';		-- mappa 3D00 - 3DFF
+	map3DXX	<= '1' when A(15 downto 8) =	"00111101"   else '0';		-- mappa 3D00 - 3DFF
  
-	map1F00 <= '0' when A(15 downto 3) =   "0001111111111"  else '1';	-- 1ff8 - 1fff
-
-
+	map1F00	<= '0' when A(15 downto 3) =	"0001111111111"  else '1';	-- 1ff8 - 1fff
+--	============================================================================================================
 process(mreq)
 	begin
 
@@ -143,7 +142,7 @@ process(mreq)
 end process; 
 
 	mapcondout <= mapcond;
- 
+--	============================================================================================================ 
 -- divide control port
 												
 	divideio <='0' when iorq='0' and wr='0' and M1='1' and address = divide_control_port else '1';  	
@@ -159,13 +158,13 @@ process(divideio,poweron)
 			
 		elsif	rising_edge(divideio) then
 		
-				bank(5 downto 0) <= D(5 downto 0);
-				mapram           <= D(6) or mapram;
-				conmem          <= D(7);
+				bank(5 downto 0)	<= D(5 downto 0);
+				mapram				<= D(6) or mapram;
+				conmem				<= D(7);
 		end if;
 	
 end process;	
-			
+--	============================================================================================================			
 -- ram banks 
 
 	bankout(0) <= bank(0) or not A(13);
@@ -174,27 +173,25 @@ end process;
 	bankout(3) <= bank(3) and    A(13);
 	bankout(4) <= bank(4) and    A(13);
 	bankout(5) <= bank(5) and    A(13);
-
+--	============================================================================================================
 -- SD CS signal management
-	zxmmcio <= '0' when  address = zxmmc_control_port and iorq='0' and m1='1' and wr ='0' else '1';
+	zxmmcio	<= '0' when  address = zxmmc_control_port and iorq='0' and m1='1' and wr ='0' else '1';
 
 
 process(reset, zxmmcio)
 	begin
 		if reset = '0' then
-				card(0) <= '1';
-				card(1) <= '1';
+				card(0)	<= '1';
+				card(1)	<= '1';
 		
 		elsif rising_edge(zxmmcio) then
 		
-				card(0)  <= D(0);
-				card(1)  <= D(1);
+				card(0)	<= D(0);
+				card(1)	<= D(1);
 		
 		end if;
 end process;
-
-
-
+--	============================================================================================================
 -- spi transmission/reception
 
 	-- Update transmission state
@@ -254,6 +251,6 @@ end process;
 
 	D <= toCPUByte when (address = zxmmc_spi_port) and (iorq = '0') and (rd = '0') and m1='1' else "ZZZZZZZZ";
 
-
+--	============================================================================================================
 end Behavioral;
 
